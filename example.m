@@ -1,4 +1,5 @@
-et    = cspice_str2et('2023-02-12T18:36:20');
+et    = cspice_str2et('2023 February 12, 18:36:20 UTC');
+date = cspice_et2utc(et,'C',6);
 
 moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
 sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
@@ -11,9 +12,11 @@ l_sun = sun(1:3).';
 writematrix(l_moon,'l_moon.txt','Delimiter',',') 
 writematrix(l_sun,'l_sun.txt','Delimiter',',')
 
-qua_equ = [0.44994;0.654557;-0.041124;0.606151];
+qua_equ = [0.606151;0.44994;0.654557;-0.041124];
 
 attitude_equ = inv(cspice_q2m(qua_equ));
+
+% quat = quaternion(inv(attitude_equ),'rotvec');
 % r1 = eye(3);
 % r2 = cspice_rotmat(r1, cspice_halfpi, 1);
 % r3 = cspice_rotmat(r2, cspice_halfpi, 3);
