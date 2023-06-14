@@ -1,5 +1,32 @@
 clear()
 
+addpath('~/simulator/mice/src/mice/')
+addpath('~/simulator/mice/lib/')
+
+% currentDir = pwd;
+cd ../kernel/
+
+% Leapsecond kernel;
+cspice_furnsh('naif0012.tls');
+
+% Planet ephemeris kernel;
+% cspice_furnsh('de430.bsp');
+cspice_furnsh('de440.bsp');
+
+cd ../scripts/
+
+
+info = readmatrix('./information.csv');
+[row1,col1] = size(info);
+id = info(row1,1) + 1;
+
+if isnan(id)
+    id = 1;
+end
+
+
+
+rng('shuffle');
 et_min = 7.2247686918289995e+08;
 et_max = 7.5962046918519998e+08;
 
@@ -8,8 +35,8 @@ et = et_min + randi(round(et_max-et_min));
 date = cspice_et2utc(et,'C',6);
 disp(date)
 
-celestial = "moon";
-% celestial = "earth";
+% celestial = "moon";
+celestial = "earth";
 
 moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
 sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
@@ -25,8 +52,8 @@ else
     R = 6378.1;
 end
 
-writematrix(l_moon,'l_moon.txt','Delimiter',',') 
-writematrix(l_sun,'l_sun.txt','Delimiter',',')
+% writematrix(l_moon,'l_moon.txt','Delimiter',',') 
+% writematrix(l_sun,'l_sun.txt','Delimiter',',')
 
 M = readmatrix('./orbit_equ/orbit_equ.dat');
 
@@ -39,7 +66,7 @@ for i = 1:row
     end
 end
 disp(r_equ)
-writematrix(r_equ,'r_equ.txt','Delimiter',',') 
+% writematrix(r_equ,'r_equ.txt','Delimiter',',') 
 
 
 cele_vector = l_cele - r_equ;
@@ -76,9 +103,27 @@ dphi = -dphi_max + dphi_max * randi(200) / 100;
 dcm4 = cspice_rotmat(dcm2, dphi, 3);
 
 
-writematrix(dcm4(1,:),'dcm1.txt','Delimiter',',')
-writematrix(dcm4(2,:),'dcm2.txt','Delimiter',',')
-writematrix(dcm4(3,:),'dcm3.txt','Delimiter',',')
+% writematrix(dcm4(1,:),'dcm1.txt','Delimiter',',')
+% writematrix(dcm4(2,:),'dcm2.txt','Delimiter',',')
+% writematrix(dcm4(3,:),'dcm3.txt','Delimiter',',')
+
+% dlpから見た姿勢
+dlp_dcm = cspice_rotmat(dcm4, pi, 2);
+
+% writematrix(dlp_dcm(1,:),'dcm1.txt','Delimiter',',')
+% writematrix(dlp_dcm(2,:),'dcm2.txt','Delimiter',',')
+% writematrix(dlp_dcm(3,:),'dcm3.txt','Delimiter',',')
+
+% dlpから見た太陽方向
+sun_dlp = l_sun*dlp_dcm';
+disp(sun_dlp)
+
+
+
+inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp];
+
+writematrix(inforow, "information.csv", 'WriteMode', 'append')
+writematrix(inforow,"inforow.txt", 'Delimiter',',')
 
 
 
