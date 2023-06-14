@@ -8,13 +8,11 @@ et = et_min + randi(round(et_max-et_min));
 date = cspice_et2utc(et,'C',6);
 disp(date)
 
-celestial = "moon";
-% celestial = "earth";
+% celestial = "moon";
+celestial = "earth";
 
 moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
 sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
-% disp(moon(1:3))
-% disp(sun(1:3))
 
 l_moon = moon(1:3).';
 l_sun = sun(1:3).';
@@ -45,43 +43,19 @@ cele_vector = l_cele - r_equ;
 % グラムシュミット法
 a1 = [1,0,0];
 a2 = [0,1,0];
-
-dcm2 = cele_vector/norm(cele_vector);
-
-b1 = a1 - dot(a1,dcm2)*dcm2;
-dcm1 = b1/norm(b1);
-
-% b3 = a2 - dot(a2,dcm2)*dcm2 - dot(a2,dcm1)*dcm1;
-% dcm3 = b3/norm(b3);
-
-dcm3 = cross(dcm1,dcm2);
-
-% cele_x= cele_vector(1,1);
-% cele_y= cele_vector(1,2);
-% cele_z= cele_vector(1,3);
-% 
-% theta = subspace([0;1;0],cele_vector');
-% lambda = [cele_z/(cele_x^2 + cele_z^2)^0.5; 0; cele_x/(-cele_x^2 + cele_z^2)^0.5];
-% 
-% quaternion = [cos(theta/2); lambda(1)*sin(theta/2); lambda(2)*sin(theta/2); lambda(3)*sin(theta/2)];
-% 
-% dcm = cspice_q2m(quaternion);
-
-
-
-writematrix(dcm1,'dcm1.txt','Delimiter',',')
-writematrix(dcm2,'dcm2.txt','Delimiter',',')
-writematrix(dcm3,'dcm3.txt','Delimiter',',')
+dcm1_y = cele_vector/norm(cele_vector);
+b1 = a1 - dot(a1,dcm1_y)*dcm1_y;
+dcm1_x = b1/norm(b1);
+dcm1_z = cross(dcm1_x,dcm1_y);
 
 
 
 
 
-% disp(attitude_equ)
-% disp(attitude_equ(2,:))
-% 
-% writematrix(attitude_equ(2,:),'attitude_equ.txt','Delimiter',',') 
 
+writematrix(dcm1_x,'dcm1.txt','Delimiter',',')
+writematrix(dcm1_y,'dcm2.txt','Delimiter',',')
+writematrix(dcm1_z,'dcm3.txt','Delimiter',',')
 
 
 disp(r_equ)

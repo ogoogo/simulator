@@ -31,7 +31,7 @@ global_settings{
 camera{ 
 	// location L_equ
 	location <0,0,0>
-	sky <0,0,1>
+	// sky <0,0,1>
 	look_at <0,1,0>
 
 	matrix <c11, c12, c13,

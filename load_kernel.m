@@ -1,3 +1,6 @@
+addpath('~/simulator/mice/src/mice/')
+addpath('~/simulator/mice/lib/')
+
 currentDir = pwd;
 cd ../kernel/
 
@@ -21,4 +24,8 @@ cspice_furnsh('pck00010.tpc');
 cspice_furnsh('earth_fixed.tf');
 % https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/
 %cspice_furnsh('earth_latest_high_prec.bpc'); 
+
+cd ../scripts/
+
+
 
