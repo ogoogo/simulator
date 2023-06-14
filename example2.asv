@@ -8,8 +8,8 @@ et = et_min + randi(round(et_max-et_min));
 date = cspice_et2utc(et,'C',6);
 disp(date)
 
-celestial = "moon";
-% celestial = "earth";
+% celestial = "moon";
+celestial = "earth";
 
 moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
 sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
@@ -38,8 +38,6 @@ for i = 1:row
         break
     end
 end
-disp(r_equ)
-writematrix(r_equ,'r_equ.txt','Delimiter',',') 
 
 
 cele_vector = l_cele - r_equ;
@@ -59,29 +57,33 @@ dcm1 = [dcm1_x; dcm1_y; dcm1_z];
 l = norm(cele_vector);
 
 % 回転させる
-dcm2 = cspice_rotmat(dcm1, 2*pi*randi(100)/100, 2);
+dcm2 = cspice_rotmat(dcm1, 2*pi*randi(100)/100, 1);
 
 %縦方向にずらす
 psi = deg2rad(2.09);
 dpsi_max = atan((l*tan(psi) - R/2)/l);
 dpsi = -dpsi_max + dpsi_max * randi(200) / 100;
 
-dcm3 = cspice_rotmat(dcm1, dpsi, 1);
+dcm2 = cspice_rotmat(dcm1, dpsi, 1);
 
 % 横方向にずらす
 phi = deg2rad(2.79);
 dphi_max = atan((l*tan(phi) - R/2)/l);
 dphi = -dphi_max + dphi_max * randi(200) / 100;
 
-dcm4 = cspice_rotmat(dcm2, dphi, 3);
-
-
-writematrix(dcm4(1,:),'dcm1.txt','Delimiter',',')
-writematrix(dcm4(2,:),'dcm2.txt','Delimiter',',')
-writematrix(dcm4(3,:),'dcm3.txt','Delimiter',',')
+dcm3 = cspice_rotmat(dcm2, dphi, 3);
 
 
 
+
+
+writematrix(dcm3(1,:),'dcm1.txt','Delimiter',',')
+writematrix(dcm3(2,:),'dcm2.txt','Delimiter',',')
+writematrix(dcm3(3,:),'dcm3.txt','Delimiter',',')
+
+
+disp(r_equ)
+writematrix(r_equ,'r_equ.txt','Delimiter',',') 
 
 
 
