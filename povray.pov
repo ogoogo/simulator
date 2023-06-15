@@ -53,7 +53,7 @@ camera{
 
    
     right -x*image_width/image_height
-	angle 7
+	angle 30
 
 } 
 light_source { 

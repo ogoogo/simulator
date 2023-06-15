@@ -3,17 +3,12 @@ clear()
 addpath('~/simulator/mice/src/mice/')
 addpath('~/simulator/mice/lib/')
 
-% currentDir = pwd;
-cd ../kernel/
-
-% Leapsecond kernel;
-cspice_furnsh('naif0012.tls');
-
-% Planet ephemeris kernel;
-% cspice_furnsh('de430.bsp');
-cspice_furnsh('de440.bsp');
-
-cd ../scripts/
+if cspice_ktotal( 'ALL' ) >= 1
+else
+    disp('kernels settings')
+    cspice_furnsh('../kernel/naif0012.tls');
+    cspice_furnsh('../kernel/de440.bsp');
+end
 
 
 info = readmatrix('./information.csv');
