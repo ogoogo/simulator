@@ -113,6 +113,23 @@ dlp_dcm = cspice_rotmat(dcm4, pi, 2);
 sun_dlp = l_sun*dlp_dcm';
 disp(sun_dlp)
 
+% 月の座標変換
+moon_i = l_moon/norm(l_moon);
+z = acos(norm([l_moon(1),l_moon(2)])/norm(l_moon));
+if l_moon(3)>0
+    moon_dk = [0, 0, norm(l_moon)/sin(z)] - l_moon;
+else
+    moon_dk = -([0, 0, -norm(l_moon)/sin(z)] - l_moon);
+end
+moon_k = moon_dk/norm(moon_dk);
+moon_j = cross(moon_k,moon_i);
+
+dcm_moon1 = [moon_i;moon_j;moon_k];
+% dcm_moon2 = [1,0,0;0,0,1;0,-1,0]*[moon_i;moon_j;moon_k];
+dcm_moon2 = cspice_rotmat(dcm_moon1,pi/2,1);
+dcm_moon = [dcm_moon2(1,:),dcm_moon2(2,:),dcm_moon2(3,:)];
+writematrix(dcm_moon,"moondcm.txt", 'Delimiter',',')
+
 
 
 inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp];

@@ -3,7 +3,7 @@ clear()
 
 % et    = cspice_str2et('2023 April 12, 11:39:36 UTC');
 et    = cspice_str2et('2022 December 18, 21:11:11 UTC');
-% et2 = et-1500;
+et = et-1500;
 revNum = '221215-0100';
 fileNum = '221218-0100';
 fileName = append('./source/',fileNum, '_HK_stored_svtlm.csv');
@@ -71,6 +71,7 @@ sun_dlp = l_sun*dlp_dcm';
 % disp(sun_dlp)
 
 % 月の座標変換
+
 moon_i = l_moon/norm(l_moon);
 z = acos(norm([l_moon(1),l_moon(2)])/norm(l_moon));
 if l_moon(3)>0
@@ -79,12 +80,12 @@ else
     moon_dk = -([0, 0, -norm(l_moon)/sin(z)] - l_moon);
 end
 moon_k = moon_dk/norm(moon_dk);
-moon_j = cross(moon_k,moon_i);
+moon_j = -cross(moon_i,moon_k);
 
-dcm_moon1 = [moon_i;moon_j;moon_k];
-% dcm_moon2 = [1,0,0;0,0,1;0,-1,0]*[moon_i;moon_j;moon_k];
-dcm_moon2 = cspice_rotmat(dcm_moon1,pi/2,1);
-dcm_moon = [dcm_moon2(1,:),dcm_moon2(2,:),dcm_moon2(3,:)];
+disp("sita")
+disp(moon_i*moon_k')
+
+dcm_moon = [moon_i,moon_j,moon_k];
 writematrix(dcm_moon,"./../moondcm.txt", 'Delimiter',',')
 
 
