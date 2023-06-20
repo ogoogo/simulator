@@ -65,9 +65,13 @@ disp(dcm)
 dlp_dcm = cspice_rotmat(dcm, pi, 2);
 disp(dlp_dcm)
 
+% アライメント誤差反映
+dlp_dcm2 = cspice_rotmat(dlp_dcm,deg2rad(-0.63),1);
+dlp_dcm3 = cspice_rotmat(dlp_dcm2,deg2rad(-0.023),3);
+
 
 % dlpから見た太陽方向
-sun_dlp = l_sun*dlp_dcm';
+sun_dlp = l_sun*dlp_dcm3';
 % disp(sun_dlp)
 
 % 月の座標変換
@@ -89,7 +93,7 @@ writematrix(dcm_moon,"./../moondcm.txt", 'Delimiter',',')
 
 
 id = 1;
-inforow = [id, et, r_equ, l_moon, l_sun, dcm(1,:), dcm(2,:), dcm(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp];
+inforow = [id, et, r_equ, l_moon, l_sun, dcm(1,:), dcm(2,:), dcm(3,:), dlp_dcm3(1,:), dlp_dcm3(2,:), dlp_dcm3(3,:), sun_dlp];
 
 writematrix(inforow,"./../inforow.txt", 'Delimiter',',')
 
