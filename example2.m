@@ -30,8 +30,8 @@ et = et_min + randi(round(et_max-et_min));
 date = cspice_et2utc(et,'C',6);
 disp(date)
 
-% celestial = "moon";
-celestial = "earth";
+celestial = "moon";
+% celestial = "earth";
 
 moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
 sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');

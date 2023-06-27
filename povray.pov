@@ -30,6 +30,7 @@
 
 global_settings{
     ambient_light <0, 0, 0> // <red, green, blue}
+	hf_gray_16 on
 }
 
 camera{ 
