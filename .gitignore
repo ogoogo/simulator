@@ -3,3 +3,4 @@
 orbit_equ/
 .DS_Store
 configure_consistency/source/
+*.csv
