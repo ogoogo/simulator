@@ -70,15 +70,20 @@ light_source {
 // 	S_Cloud2
 // }
 object { 
-	sphere {<0 , 0 , 0> , 1737.4} 
-	
+	sphere {<0 , 0 , 0> , 1737.4}
 	texture { 
 		pigment { 
 			// rgb <1 , 1 , 1>
 			image_map {
  				jpeg "moonmap.jpg" map_type 1
 			} 
-		} 
+		}
+		finish{
+			diffuse 1.5
+			brilliance 2
+			crand 0
+			// phong 0.6
+		}
 	} 
 	matrix
 		<mn11,mn12,mn13,

@@ -1,10 +1,24 @@
 clear()
 
-% addpath('~/simulator/mice/src/mice/')
-% addpath('~/simulator/mice/lib/')
+% 編集引数
+min_distance = 0;
+max_distance = 200000;
+min_deg = 0;
+max_deg = 90;
 
-addpath('~/issl/research/simulator/mice/src/mice/')
-addpath('~/issl/research/simulator/mice/lib/')
+celestial = "moon";
+% celestial = "earth";
+
+
+
+equ_source_name = sprintf("./orbit_equ/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
+
+
+addpath('~/simulator/mice/src/mice/')
+addpath('~/simulator/mice/lib/')
+
+% addpath('~/issl/research/simulator/mice/src/mice/')
+% addpath('~/issl/research/simulator/mice/lib/')
 
 if cspice_ktotal( 'ALL' ) >= 1
 else
@@ -14,27 +28,66 @@ else
 end
 
 
-info = readmatrix('./information.csv');
-[row1,col1] = size(info);
-id = info(row1,1) + 1;
-
-if isnan(id)
+if exist('./information.csv') == 0
     id = 1;
+else
+    info = readmatrix('./information.csv');
+    [row1,col1] = size(info);
+    id = info(row1,1) + 1;
 end
 
 
 
+
+
 rng('shuffle');
-et_min = 7.2247686918289995e+08;
-et_max = 7.5962046918519998e+08;
+% et_min = 7.2247686918289995e+08;
+% et_max = 7.5962046918519998e+08;
+% 
+% et = et_min + randi(round(et_max-et_min));
+% 
+% date = cspice_et2utc(et,'C',6);
+% disp(date)
 
-et = et_min + randi(round(et_max-et_min));
 
-date = cspice_et2utc(et,'C',6);
-disp(date)
 
-celestial = "moon";
-% celestial = "earth";
+% writematrix(l_moon,'l_moon.txt','Delimiter',',') 
+% writematrix(l_sun,'l_sun.txt','Delimiter',',')
+
+M = readmatrix('./orbit_equ/orbit_equ.dat');
+
+[row,col] = size(M);
+
+
+if exist(equ_source_name) == 0
+    for i = 1:row
+        r_equ = M(i,2:4);
+        r_sun = M(i,8:10);
+        if celestial == "moon"
+            r_cele = M(i,14:16);
+        else
+            r_cele = [0,0,0];
+         end
+        norm_cele = norm(r_cele - r_equ);
+        rad_cele = acos(dot(r_cele,r_equ)/(norm(r_equ)*norm(r_cele)));
+        deg_cele = rad2deg(rad_cele);
+        if min_distance < norm_cele && norm_cele < max_distance
+            if min_deg < deg_cele && deg_cele < max_deg
+                writematrix(M(i,:), equ_source_name, 'WriteMode', 'append')
+            end
+            
+        end
+    end
+end
+
+equ_source = readmatrix(equ_source_name);
+[row2,col2] = size(equ_source);
+
+source_i = randi(row2);
+r_equ = equ_source(source_i,2:4);
+
+et = equ_source(source_i,1);
+
 
 moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
 sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
@@ -50,24 +103,31 @@ else
     R = 6378.1;
 end
 
-% writematrix(l_moon,'l_moon.txt','Delimiter',',') 
-% writematrix(l_sun,'l_sun.txt','Delimiter',',')
-
-M = readmatrix('./orbit_equ/orbit_equ.dat');
-
-[row,col] = size(M);
-
-for i = 1:row
-    if M(i,1) < et && et < M(i+1,1)
-        r_equ = M(i,2:4);
-        break
-    end
-end
-disp(r_equ)
-% writematrix(r_equ,'r_equ.txt','Delimiter',',') 
-
-
 cele_vector = l_cele - r_equ;
+
+
+% while 1
+%     for i = 1:row
+%         if M(i,1) < et && et < M(i+1,1)
+%             r_equ = M(i,2:4);
+%             break
+%         end
+%     end
+%     cele_vector = l_cele - r_equ;
+%     norm_cele = norm(cele_vector);
+%     if 0 < norm_cele && norm_cele < 700000
+%         
+%         break
+%     end
+%     
+% 
+% end
+
+
+
+% cele_vector = l_cele - r_equ;
+
+
 
 % グラムシュミット法
 a1 = [1,0,0];
@@ -91,14 +151,14 @@ psi = deg2rad(2.09);
 dpsi_max = atan((l*tan(psi) - R/2)/l);
 dpsi = -dpsi_max + dpsi_max * randi(200) / 100;
 
-dcm3 = cspice_rotmat(dcm1, dpsi, 1);
+dcm3 = cspice_rotmat(dcm2, dpsi, 1);
 
 % 横方向にずらす
 phi = deg2rad(2.79);
 dphi_max = atan((l*tan(phi) - R/2)/l);
 dphi = -dphi_max + dphi_max * randi(200) / 100;
 
-dcm4 = cspice_rotmat(dcm2, dphi, 3);
+dcm4 = cspice_rotmat(dcm3, dphi, 3);
 
 
 % writematrix(dcm4(1,:),'dcm1.txt','Delimiter',',')
@@ -138,7 +198,7 @@ if celestial == "moon"
 else
     cele_dlp = (- r_equ)*dlp_dcm';
 end
-
+disp(cele_dlp)
 inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, cele_dlp];
 
 writematrix(inforow, "information.csv", 'WriteMode', 'append')
