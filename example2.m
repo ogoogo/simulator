@@ -198,7 +198,54 @@ if celestial == "moon"
 else
     cele_dlp = (- r_equ)*dlp_dcm';
 end
-disp(cele_dlp)
+disp(cele_dlp')
+
+% 楕円係数を求める
+Tcp = dcm_moon1/dlp_dcm;
+
+A_mat = Tcp'*(1/R^2)*eye(3)*Tcp;
+disp("A")
+disp(A_mat)
+r_vec = cele_dlp';
+M_mat =A_mat*r_vec*(r_vec')*A_mat - (r_vec'*A_mat*r_vec - 1)*A_mat;
+disp(M_mat);
+
+
+
+A = M_mat(1,1);
+B = 2*M_mat(1,2);
+C = M_mat(2,2);
+D = 2*M_mat(1,3);
+F = 2*M_mat(2,3);
+G = M_mat(3,3);
+coefficient = [A,B,C,D,F,G];
+disp(coefficient);
+
+% 楕円を描画する範囲を指定
+xMin = -500;
+xMax = 500;
+yMin = -500;
+yMax = 500;
+
+% 描画用のグリッドを作成
+[X, Y] = meshgrid(linspace(xMin, xMax, 100), linspace(yMin, yMax, 100));
+
+% 楕円の方程式を計算
+Z = A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
+
+% 楕円をプロット
+figure;
+contour(X, Y, Z, [0 0], 'LineWidth', 2);  % 楕円を等高線で描画
+axis equal;  % アスペクト比を保持
+xlabel('X軸');
+ylabel('Y軸');
+title('楕円の描画');
+grid on;
+
+
+
+
+
 inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, cele_dlp];
 
 writematrix(inforow, "information.csv", 'WriteMode', 'append')
