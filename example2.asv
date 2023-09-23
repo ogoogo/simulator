@@ -11,7 +11,7 @@ celestial = "moon";
 
 
 
-equ_source_name = sprintf("./orbit_equ/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
+equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
 
 
 addpath('~/simulator/mice/src/mice/')
@@ -62,7 +62,9 @@ M = readmatrix('./orbit_equ/orbit_equ.dat');
 if exist(equ_source_name) == 0
     for i = 1:row
         r_equ = M(i,2:4);
-        r_sun = M(i,8:10);
+        et = M(i,1);
+        r_sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
+        
         if celestial == "moon"
             r_cele = M(i,14:16);
         else
@@ -222,26 +224,35 @@ coefficient = [A,B,C,D,F,G];
 disp(coefficient);
 
 % 楕円を描画する範囲を指定
-xMin = -500;
-xMax = 500;
-yMin = -500;
-yMax = 500;
+xMin = -5;
+xMax = 5;
+yMin = -5;
+yMax = 5;
 
-% 描画用のグリッドを作成
-[X, Y] = meshgrid(linspace(xMin, xMax, 100), linspace(yMin, yMax, 100));
 
-% 楕円の方程式を計算
-Z = A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
 
-% 楕円をプロット
-figure;
-contour(X, Y, Z, [0 0], 'LineWidth', 2);  % 楕円を等高線で描画
-axis equal;  % アスペクト比を保持
-xlabel('X軸');
-ylabel('Y軸');
-title('楕円の描画');
-grid on;
+fnc = @(X,Y) A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
 
+figure
+fimplicit(fnc)
+ylim([-1 1])
+grid on
+
+% % 描画用のグリッドを作成
+% [X, Y] = meshgrid(linspace(xMin, xMax, 100), linspace(yMin, yMax, 100));
+% 
+% % 楕円の方程式を計算
+% Z = A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
+% 
+% % 楕円をプロット
+% figure;
+% contour(X, Y, Z, [0 0], 'LineWidth', 2);  % 楕円を等高線で描画
+% axis equal;  % アスペクト比を保持
+% xlabel('X軸');
+% ylabel('Y軸');
+% title('楕円の描画');
+% grid on;
+% 
 
 
 

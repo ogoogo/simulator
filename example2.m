@@ -11,7 +11,7 @@ celestial = "moon";
 
 
 
-equ_source_name = sprintf("./orbit_equ/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
+equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
 
 
 addpath('~/simulator/mice/src/mice/')
@@ -43,41 +43,52 @@ end
 rng('shuffle');
 % et_min = 7.2247686918289995e+08;
 % et_max = 7.5962046918519998e+08;
-% 
+%
 % et = et_min + randi(round(et_max-et_min));
-% 
+%
 % date = cspice_et2utc(et,'C',6);
 % disp(date)
 
 
 
-% writematrix(l_moon,'l_moon.txt','Delimiter',',') 
+% writematrix(l_moon,'l_moon.txt','Delimiter',',')
 % writematrix(l_sun,'l_sun.txt','Delimiter',',')
 
-M = readmatrix('./orbit_equ/orbit_equ.dat');
 
-[row,col] = size(M);
+
+
 
 
 if exist(equ_source_name) == 0
-    for i = 1:row
-        r_equ = M(i,2:4);
-        r_sun = M(i,8:10);
-        if celestial == "moon"
-            r_cele = M(i,14:16);
-        else
-            r_cele = [0,0,0];
-         end
-        norm_cele = norm(r_cele - r_equ);
-        rad_cele = acos(dot(r_equ-r_cele,r_sun-r_cele)/(norm(r_equ-r_cele)*norm(r_sun-r_cele)));
-        deg_cele = rad2deg(rad_cele);
-        if min_distance < norm_cele && norm_cele < max_distance
-            if min_deg < deg_cele && deg_cele < max_deg
-                writematrix(M(i,:), equ_source_name, 'WriteMode', 'append')
+    for j = 0:85
+        disp(j)
+        fileName = sprintf('./orbit_equ/orbit_equ%d.dat',j);
+        M = readmatrix(fileName);
+        [row,col] = size(M);
+        for i = 1:row
+
+            r_equ = M(i,2:4);
+            et = M(i,1);
+            cspice_sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
+            r_sun = cspice_sun(1:3)';
+            if celestial == "moon"
+                cspice_cele = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
+                r_cele = cspice_cele(1:3)';
+            else
+                r_cele = [0,0,0];
             end
-            
+            norm_cele = norm(r_cele - r_equ);
+            rad_cele = acos(dot(r_equ-r_cele,r_sun-r_cele)/(norm(r_equ-r_cele)*norm(r_sun-r_cele)));
+            deg_cele = rad2deg(rad_cele);
+            if min_distance < norm_cele && norm_cele < max_distance
+                if min_deg < deg_cele && deg_cele < max_deg
+                    writematrix(M(i,:), equ_source_name, 'WriteMode', 'append')
+                end
+
+            end
         end
     end
+
 end
 
 equ_source = readmatrix(equ_source_name);
@@ -116,11 +127,11 @@ cele_vector = l_cele - r_equ;
 %     cele_vector = l_cele - r_equ;
 %     norm_cele = norm(cele_vector);
 %     if 0 < norm_cele && norm_cele < 700000
-%         
+%
 %         break
 %     end
-%     
-% 
+%
+%
 % end
 
 
@@ -186,7 +197,7 @@ else
 end
 moon_k = moon_dk/norm(moon_dk);
 moon_j = cross(moon_k,moon_i);
- 
+
 dcm_moon1 = [moon_i;moon_j;moon_k];
 % dcm_moon2 = [1,0,0;0,0,1;0,-1,0]*[moon_i;moon_j;moon_k];
 dcm_moon2 = cspice_rotmat(dcm_moon1,pi/2,1);
@@ -222,26 +233,35 @@ coefficient = [A,B,C,D,F,G];
 disp(coefficient);
 
 % 楕円を描画する範囲を指定
-xMin = -500;
-xMax = 500;
-yMin = -500;
-yMax = 500;
+xMin = -5;
+xMax = 5;
+yMin = -5;
+yMax = 5;
 
-% 描画用のグリッドを作成
-[X, Y] = meshgrid(linspace(xMin, xMax, 100), linspace(yMin, yMax, 100));
 
-% 楕円の方程式を計算
-Z = A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
 
-% 楕円をプロット
-figure;
-contour(X, Y, Z, [0 0], 'LineWidth', 2);  % 楕円を等高線で描画
-axis equal;  % アスペクト比を保持
-xlabel('X軸');
-ylabel('Y軸');
-title('楕円の描画');
-grid on;
+fnc = @(X,Y) A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
 
+figure
+fimplicit(fnc)
+ylim([-1 1])
+grid on
+
+% % 描画用のグリッドを作成
+% [X, Y] = meshgrid(linspace(xMin, xMax, 100), linspace(yMin, yMax, 100));
+%
+% % 楕円の方程式を計算
+% Z = A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
+%
+% % 楕円をプロット
+% figure;
+% contour(X, Y, Z, [0 0], 'LineWidth', 2);  % 楕円を等高線で描画
+% axis equal;  % アスペクト比を保持
+% xlabel('X軸');
+% ylabel('Y軸');
+% title('楕円の描画');
+% grid on;
+%
 
 
 
@@ -256,5 +276,5 @@ writematrix(inforow,"inforow.txt", 'Delimiter',',')
 
 
 
-    
- 
+
+
