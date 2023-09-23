@@ -69,10 +69,10 @@ if exist(equ_source_name) == 0
 
             r_equ = M(i,2:4);
             et = M(i,1);
-            cspice_sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
+            cspice_sun = cspice_spkezr('SUN', et, 'ECLIPJ2000','NONE','EARTH');
             r_sun = cspice_sun(1:3)';
             if celestial == "moon"
-                cspice_cele = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
+                cspice_cele = cspice_spkezr('MOON', et, 'ECLIPJ2000','NONE','EARTH');
                 r_cele = cspice_cele(1:3)';
             else
                 r_cele = [0,0,0];
@@ -100,8 +100,11 @@ r_equ = equ_source(source_i,2:4);
 et = equ_source(source_i,1);
 
 
-moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
-sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
+moon = cspice_spkezr('MOON', et, 'ECLIPJ2000','NONE','EARTH');
+sun = cspice_spkezr('SUN', et, 'ECLIPJ2000','NONE','EARTH');
+
+% moon = cspice_spkezr('MOON', et, 'J2000','NONE','EARTH');
+% sun = cspice_spkezr('SUN', et, 'J2000','NONE','EARTH');
 
 l_moon = moon(1:3).';
 l_sun = sun(1:3).';
@@ -244,7 +247,7 @@ fnc = @(X,Y) A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
 
 figure
 fimplicit(fnc)
-ylim([-1 1])
+ylim([-10 10])
 grid on
 
 % % 描画用のグリッドを作成

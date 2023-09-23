@@ -47,7 +47,7 @@ dcm = inv(cspice_q2m(q));
 
 
 
-M = readmatrix('./../orbit_equ/orbit_equ.dat');
+M = readmatrix('./../orbit_equ/orbit_equ0.dat');
 
 [row,col] = size(M);
 
