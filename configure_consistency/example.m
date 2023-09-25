@@ -93,11 +93,9 @@ dcm_moon2 = cspice_rotmat(dcm_moon1,pi/2,1);
 
 % 月面図調整
 dcm_moon0 = eye(3);
-% dcm_moon3 = cspice_rotmat(dcm_moon0, 1, 3);
-% dcm_moon4 = cspice_rotmat(dcm_moon3, 0.2, 2);
-% dcm_moon5 = cspice_rotmat(dcm_moon4, -0.2, 1);
+dcm_moon3 = cspice_rotmat(dcm_moon0, -23.4/180*pi, 1);
 
-dcm_moon6 = dcm_moon0*dcm_moon2;
+dcm_moon6 = dcm_moon3*dcm_moon2;
 
 dcm_moon = [dcm_moon6(1,:),dcm_moon6(2,:),dcm_moon6(3,:)];
 writematrix(dcm_moon,"./../moondcm.txt", 'Delimiter',',')

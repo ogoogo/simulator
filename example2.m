@@ -162,14 +162,14 @@ dcm2 = cspice_rotmat(dcm1, 2*pi*randi(100)/100, 2);
 
 %縦方向にずらす
 psi = deg2rad(2.09);
-dpsi_max = atan((l*tan(psi) - R/2)/l);
+dpsi_max = atan((l*tan(psi) - R)/l);
 dpsi = -dpsi_max + dpsi_max * randi(200) / 100;
 
 dcm3 = cspice_rotmat(dcm2, dpsi, 1);
 
 % 横方向にずらす
 phi = deg2rad(2.79);
-dphi_max = atan((l*tan(phi) - R/2)/l);
+dphi_max = atan((l*tan(phi) - R)/l);
 dphi = -dphi_max + dphi_max * randi(200) / 100;
 
 dcm4 = cspice_rotmat(dcm3, dphi, 3);
@@ -203,9 +203,17 @@ moon_j = cross(moon_k,moon_i);
 
 dcm_moon1 = [moon_i;moon_j;moon_k];
 % dcm_moon2 = [1,0,0;0,0,1;0,-1,0]*[moon_i;moon_j;moon_k];
+% 真の月のdcm
 dcm_moon2 = cspice_rotmat(dcm_moon1,pi/2,1);
-dcm_moon = [dcm_moon2(1,:),dcm_moon2(2,:),dcm_moon2(3,:)];
-writematrix(dcm_moon,"moondcm.txt", 'Delimiter',',')
+
+% 月面図調整
+dcm_moon0 = eye(3);
+dcm_moon3 = cspice_rotmat(dcm_moon0, -23.4/180*pi, 1);
+
+dcm_moon6 = dcm_moon3*dcm_moon2;
+
+dcm_moon = [dcm_moon6(1,:),dcm_moon6(2,:),dcm_moon6(3,:)];
+writematrix(dcm_moon,".moondcm.txt", 'Delimiter',',')
 
 if celestial == "moon"
     cele_dlp = (l_moon - r_equ)*dlp_dcm';
