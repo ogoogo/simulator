@@ -1,7 +1,7 @@
 clear()
 
 % 編集引数
-min_distance = 0;
+min_distance = 70000;
 max_distance = 200000;
 min_deg = 0;
 max_deg = 90;
@@ -59,8 +59,8 @@ rng('shuffle');
 
 
 
-if exist(equ_source_name) == 0
-    for j = 0:85
+if exist(equ_source_name,"file") == 0
+    for j = 1:85
         disp(j)
         fileName = sprintf('./orbit_equ/orbit_equ%d.dat',j);
         M = readmatrix(fileName);
@@ -216,12 +216,14 @@ disp(cele_dlp')
 
 % 楕円係数を求める
 Tcp = dcm_moon1/dlp_dcm;
+Tcp = cspice_rotmat(Tcp, pi/2, 1);
 
-A_mat = Tcp'*(1/R^2)*eye(3)*Tcp;
+% A_mat = Tcp'*(1/(R^2))*eye(3)*Tcp;
+A_mat = (1/(R^2))*eye(3);
 disp("A")
 disp(A_mat)
-r_vec = cele_dlp';
-M_mat =A_mat*r_vec*(r_vec')*A_mat - (r_vec'*A_mat*r_vec - 1)*A_mat;
+r_vec = [1 0 0; 0 0 1; 0 1 0]*cele_dlp';
+M_mat =(A_mat*r_vec*(r_vec')*A_mat - (r_vec'*A_mat*r_vec - 1)*A_mat);
 disp(M_mat);
 
 
@@ -232,41 +234,19 @@ C = M_mat(2,2);
 D = 2*M_mat(1,3);
 F = 2*M_mat(2,3);
 G = M_mat(3,3);
-coefficient = [A,B,C,D,F,G];
-disp(coefficient);
 
-% 楕円を描画する範囲を指定
-xMin = -5;
-xMax = 5;
-yMin = -5;
-yMax = 5;
+disp([A,B,C,D,F,G])
 
 
 
-fnc = @(X,Y) A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
+fnc = @(X,Y) A * (X/50).^2 + B * (X/50) .* (Y/50) + C * (Y/50).^2 + D * X/50 + F * Y/50 + G;
 
 figure
 fimplicit(fnc)
-ylim([-10 10])
+xlim([-2.44, 2.44])
+ylim([-1.83, 1.83])
 grid on
-
-% % 描画用のグリッドを作成
-% [X, Y] = meshgrid(linspace(xMin, xMax, 100), linspace(yMin, yMax, 100));
-%
-% % 楕円の方程式を計算
-% Z = A * X.^2 + B * X .* Y + C * Y.^2 + D * X + F * Y + G;
-%
-% % 楕円をプロット
-% figure;
-% contour(X, Y, Z, [0 0], 'LineWidth', 2);  % 楕円を等高線で描画
-% axis equal;  % アスペクト比を保持
-% xlabel('X軸');
-% ylabel('Y軸');
-% title('楕円の描画');
-% grid on;
-%
-
-
+daspect([1 1 1])
 
 
 inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, cele_dlp];
