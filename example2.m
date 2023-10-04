@@ -242,7 +242,7 @@ C = M_mat(2,2);
 D = 2*M_mat(1,3);
 F = 2*M_mat(2,3);
 G = M_mat(3,3);
-coefficient = [A/G,B/G,C/G,D/G,F/G,1];
+coefficient = [A,B,C,D,F,G];
 
 disp([A,B,C,D,F,G])
 
