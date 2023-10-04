@@ -6,26 +6,13 @@
 #include "skies.inc"
 #fopen information "inforow.txt" read
 #fopen moon_dcm "moondcm.txt" read
-// #fopen data_moon "l_moon.txt" read
-// #fopen data_sun "l_sun.txt" read
-// #fopen data_attitude "attitude_equ.txt" read
-// #fopen data_equ "r_equ.txt" read
-// #fopen data_dcm "dcm.txt" read
-// #fopen data_dcm1 "dcm1.txt" read
-// #fopen data_dcm2 "dcm2.txt" read
-// #fopen data_dcm3 "dcm3.txt" read
-#read(information, id, et, r_x, r_y, r_z, moon_x, moon_y, moon_z, sun_x, sun_y, sun_z, c_e11, c_e12, c_e13, c_e21, c_e22, c_e23, c_e31, c_e32, c_e33, c11, c12, c13, c21, c22, c23, c31, c32, c33, sun_d_x, sun_d_y, sun_d_z)
-#read(moon_dcm, mn11,mn12,mn13,mn21,mn22,mn23,mn31,mn32,mn33)
-// #read(data_moon, moon_x, moon_y, moon_z)
-// #read(data_sun, sun_x, sun_y, sun_z)
-// #read(data_attitude, att_x, att_y, att_z)
-// #read(data_equ, r_x, r_y, r_z)
-// #read(data_dcm1, c11, c12, c13)
-// #read(data_dcm2, c21, c22, c23)
-// #read(data_dcm3, c31, c32, c33)
+
+#read(information, id, et, r_x, r_y, r_z, moon_x, moon_y, moon_z, sun_x, sun_y, sun_z, c_e11, c_e12, c_e13, c_e21, c_e22, c_e23, c_e31, c_e32, c_e33, c11, c12, c13, c21, c22, c23, c31, c32, c33, sun_d_x, sun_d_y, sun_d_z, cele_d_x, cele_d_y, cele_d_z,mn11,mn12,mn13,mn21,mn22,mn23,mn31,mn32,mn33, ellA, ellB, ellC, ellD, ellF, ellG )
+// #read(moon_dcm, mn11,mn12,mn13,mn21,mn22,mn23,mn31,mn32,mn33)
+
 #declare L_moon = <moon_x,moon_y,moon_z>;
 #declare L_sun = <sun_x, sun_y, sun_z>;
-// #declare Att_equ = <att_x, att_y, att_z>;
+
 #declare L_equ = <r_x, r_y, r_z>;
 
 global_settings{

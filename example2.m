@@ -14,11 +14,11 @@ celestial = "moon";
 equ_source_name = sprintf("./orbit_equ_output/orbit_%d_%d_%d_%d.csv", min_distance, max_distance/10000, min_deg, max_deg);
 
 
-% addpath('~/simulator/mice/src/mice/')
-% addpath('~/simulator/mice/lib/')
+addpath('~/simulator/mice/src/mice/')
+addpath('~/simulator/mice/lib/')
 
-addpath('~/issl/research/simulator/mice/src/mice/')
-addpath('~/issl/research/simulator/mice/lib/')
+% addpath('~/issl/research/simulator/mice/src/mice/')
+% addpath('~/issl/research/simulator/mice/lib/')
 
 if cspice_ktotal( 'ALL' ) >= 1
 else
@@ -250,12 +250,15 @@ disp([A,B,C,D,F,G])
 
 fnc = @(X,Y) A * (X/50).^2 + B * (X/50) .* (Y/50) + C * (Y/50).^2 + D * X/50 + F * Y/50 + G;
 
-% figure
-% fimplicit(fnc)
-% xlim([-2.44, 2.44])
-% ylim([-1.83, 1.83])
-% grid on
-% daspect([1 1 1])
+figure
+fimplicit(fnc)
+xlim([-2.44, 2.44])
+ylim([-1.83, 1.83])
+grid on
+daspect([1 1 1])
+ellipseFile = sprintf("./ellipseImages/%d.png",id);
+% saveas(figure,ellipseFile)
+ print(ellipseFile,'-dpng')
 
 
 inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, cele_dlp, coefficient];

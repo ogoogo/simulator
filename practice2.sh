@@ -1,37 +1,16 @@
 #!/bin/sh
 
+input_csv="./informations/information1004.csv"
 
-a=0
-while [ $a -lt $1 ]
-do
-    # /Applications/MATLAB_R2022b.app/bin/matlab -nodesktop -nosplash -r 'example2; exit'
-    # /usr/local/MATLAB/R2023a/bin/matlab -nodesktop -nosplash -r 'example2; exit'
 
-    while read line
-    do
-    col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
-    # col1=`echo $line | cut -d , -f 1`
+id=1
 
-    echo $col1,$col1 >> ./test.txt
+while IFS= read -r line; do
+   
+    echo "$line" > "inforow.txt"
+    povray povray.pov +W659 +H494 Output_File_Name=./output/$id
+    echo "ID{$id}の画像生成"
+    ((id++))
 
-    # echo $id
-    # povray povray.pov +W659 +H494 Output_File_Name=./output/$id
-    # echo "ID{$id}の画像生成"
-    done < inforow.txt
-    
-    # let a++
+done < "$input_csv"
 
-    # echo $a
-    
-done

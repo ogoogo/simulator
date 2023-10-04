@@ -1,0 +1,146 @@
+function calculate_data(equ_source_name,output_name,celestial)
+if exist(output_name) == 0
+    id = 1;
+else
+    info = readmatrix(output_name);
+    [row1,col1] = size(info);
+    id = info(row1,1) + 1;
+end
+
+rng('shuffle');
+
+equ_source = readmatrix(equ_source_name);
+[row2,col2] = size(equ_source);
+
+source_i = randi(row2);
+r_equ = equ_source(source_i,2:4);
+
+et = equ_source(source_i,1);
+
+moon = cspice_spkezr('MOON', et, 'ECLIPJ2000','NONE','EARTH');
+sun = cspice_spkezr('SUN', et, 'ECLIPJ2000','NONE','EARTH');
+
+l_moon = moon(1:3).';
+l_sun = sun(1:3).';
+
+if celestial == "moon"
+    l_cele = l_moon;
+    R = 1737.4;
+else
+    l_cele = [0,0,0];
+    R = 6378.1;
+end
+
+cele_vector = l_cele - r_equ;
+
+
+
+% グラムシュミット法
+a1 = [1,0,0];
+a2 = [0,1,0];
+dcm1_y = cele_vector/norm(cele_vector);
+b1 = a1 - dot(a1,dcm1_y)*dcm1_y;
+dcm1_x = b1/norm(b1);
+dcm1_z = cross(dcm1_x,dcm1_y);
+
+dcm1 = [dcm1_x; dcm1_y; dcm1_z];
+
+
+% ランダムにずらす
+l = norm(cele_vector);
+
+% 回転させる
+dcm2 = cspice_rotmat(dcm1, 2*pi*randi(100)/100, 2);
+
+%縦方向にずらす
+psi = deg2rad(2.09);
+dpsi_max = atan((l*tan(psi) - R)/l);
+dpsi = -dpsi_max + dpsi_max * randi(200) / 100;
+
+dcm3 = cspice_rotmat(dcm2, dpsi, 1);
+
+% 横方向にずらす
+phi = deg2rad(2.79);
+dphi_max = atan((l*tan(phi) - R)/l);
+dphi = -dphi_max + dphi_max * randi(200) / 100;
+
+dcm4 = cspice_rotmat(dcm3, dphi, 3);
+
+% dlpから見た姿勢
+dlp_dcm = cspice_rotmat(dcm4, pi, 2);
+
+% dlpから見た太陽方向
+sun_dlp = l_sun*dlp_dcm';
+% disp(sun_dlp)
+
+% 月の座標変換
+moon_i = l_moon/norm(l_moon);
+z = acos(norm([l_moon(1),l_moon(2)])/norm(l_moon));
+if l_moon(3)>0
+    moon_dk = [0, 0, norm(l_moon)/sin(z)] - l_moon;
+else
+    moon_dk = -([0, 0, -norm(l_moon)/sin(z)] - l_moon);
+end
+moon_k = moon_dk/norm(moon_dk);
+moon_j = cross(moon_k,moon_i);
+
+dcm_moon1 = [moon_i;moon_j;moon_k];
+% dcm_moon2 = [1,0,0;0,0,1;0,-1,0]*[moon_i;moon_j;moon_k];
+% 真の月のdcm
+dcm_moon2 = cspice_rotmat(dcm_moon1,pi/2,1);
+
+% 月面図調整
+dcm_moon0 = eye(3);
+dcm_moon3 = cspice_rotmat(dcm_moon0, -23.4/180*pi, 1);
+
+dcm_moon6 = dcm_moon3*dcm_moon2;
+
+dcm_moon = [dcm_moon6(1,:),dcm_moon6(2,:),dcm_moon6(3,:)];
+writematrix(dcm_moon,".moondcm.txt", 'Delimiter',',')
+
+if celestial == "moon"
+    cele_dlp = (l_moon - r_equ)*dlp_dcm';
+else
+    cele_dlp = (- r_equ)*dlp_dcm';
+end
+% disp(cele_dlp')
+
+% 楕円係数を求める
+Tcp = dcm_moon1/dlp_dcm;
+Tcp = cspice_rotmat(Tcp, pi/2, 1);
+
+% A_mat = Tcp'*(1/(R^2))*eye(3)*Tcp;
+A_mat = (1/(R^2))*eye(3);
+% disp("A")
+% disp(A_mat)
+r_vec = [1 0 0; 0 0 1; 0 1 0]*cele_dlp';
+M_mat =(A_mat*r_vec*(r_vec')*A_mat - (r_vec'*A_mat*r_vec - 1)*A_mat);
+% disp(M_mat);
+
+
+
+A = M_mat(1,1);
+B = 2*M_mat(1,2);
+C = M_mat(2,2);
+D = 2*M_mat(1,3);
+F = 2*M_mat(2,3);
+G = M_mat(3,3);
+coefficient = [A,B,C,D,F,G];
+
+% disp([A,B,C,D,F,G])
+
+
+inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, cele_dlp, dcm_moon, coefficient];
+
+writematrix(inforow, output_name, 'WriteMode', 'append')
+
+
+
+end
+
+
+
+
+
+
+
