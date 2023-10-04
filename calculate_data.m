@@ -125,12 +125,12 @@ C = M_mat(2,2);
 D = 2*M_mat(1,3);
 F = 2*M_mat(2,3);
 G = M_mat(3,3);
-coefficient = [A,B,C,D,F,G];
+coefficient = [A/G,B/G,C/G,D/G,F/G,1];
 
 % disp([A,B,C,D,F,G])
 
 
-inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, cele_dlp, dcm_moon, coefficient];
+inforow = [id, et, r_equ, l_moon, l_sun, dcm4(1,:), dcm4(2,:), dcm4(3,:), dlp_dcm(1,:), dlp_dcm(2,:), dlp_dcm(3,:), sun_dlp, dcm_moon, cele_dlp, coefficient];
 
 writematrix(inforow, output_name, 'WriteMode', 'append')
 

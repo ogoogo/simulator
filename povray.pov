@@ -7,7 +7,7 @@
 #fopen information "inforow.txt" read
 #fopen moon_dcm "moondcm.txt" read
 
-#read(information, id, et, r_x, r_y, r_z, moon_x, moon_y, moon_z, sun_x, sun_y, sun_z, c_e11, c_e12, c_e13, c_e21, c_e22, c_e23, c_e31, c_e32, c_e33, c11, c12, c13, c21, c22, c23, c31, c32, c33, sun_d_x, sun_d_y, sun_d_z, cele_d_x, cele_d_y, cele_d_z,mn11,mn12,mn13,mn21,mn22,mn23,mn31,mn32,mn33, ellA, ellB, ellC, ellD, ellF, ellG )
+#read(information, id, et, r_x, r_y, r_z, moon_x, moon_y, moon_z, sun_x, sun_y, sun_z, c_e11, c_e12, c_e13, c_e21, c_e22, c_e23, c_e31, c_e32, c_e33, c11, c12, c13, c21, c22, c23, c31, c32, c33, sun_d_x, sun_d_y, sun_d_z,mn11,mn12,mn13,mn21,mn22,mn23,mn31,mn32,mn33 )
 // #read(moon_dcm, mn11,mn12,mn13,mn21,mn22,mn23,mn31,mn32,mn33)
 
 #declare L_moon = <moon_x,moon_y,moon_z>;
