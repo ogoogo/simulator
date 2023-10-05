@@ -1,11 +1,5 @@
-function calculate_data(equ_source_name,output_name,celestial)
-if exist(output_name) == 0
-    id = 1;
-else
-    info = readmatrix(output_name);
-    [row1,col1] = size(info);
-    id = info(row1,1) + 1;
-end
+function calculate_data(equ_source_name,output_name,celestial, id)
+
 
 rng('shuffle');
 

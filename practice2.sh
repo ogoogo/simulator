@@ -1,6 +1,8 @@
 #!/bin/sh
 
 input_csv="./informations/information1004.csv"
+/Applications/MATLAB_R2022b.app/bin/matlab -nodesktop -nosplash -r 'build; exit'
+ # /usr/local/MATLAB/R2023a/bin/matlab -nodesktop -nosplash -r 'example2; exit'
 
 
 id=1
